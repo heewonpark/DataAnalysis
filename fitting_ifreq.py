@@ -1,3 +1,11 @@
+#! /usr/bin/python
+# coding: UTF-8
+
+##############################################
+# This file is written by Park
+# Edited in 2015.03.23
+###############################################
+
 from matplotlib import pylab
 import scipy as sp
 import scipy.optimize

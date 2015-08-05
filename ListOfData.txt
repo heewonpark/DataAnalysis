@@ -1,0 +1,11 @@
+./original_data/30ng.atf -3
+./original_data/100ng.atf -4
+./original_data/300ng.atf -8
+./original_data/1000ng.atf 0
+./original_data/3000ng.atf -6
+./original_data/10000ng.atf 0
+./original_data/10000ng-1.atf -5
+./original_data/08812025.atf 0
+./original_data/08815040.atf 0
+./original_data/08815042.atf 0
+./original_data/08816035.atf 0
