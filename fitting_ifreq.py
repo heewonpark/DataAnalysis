@@ -7,6 +7,7 @@
 ###############################################
 
 from matplotlib import pylab
+import matplotlib.pyplot as plt
 import scipy as sp
 import scipy.optimize
 import numpy as np
@@ -64,7 +65,7 @@ for i in range(6):
     filename[i] = filename[i].rstrip('.atf')
     print filename[i]
 
-readdatfile = open("average.dat",'r')
+readdatfile = open("./analyzed_data/average.dat",'r')
 data = readdatfile.readlines()
 readdatfile.close()
 
@@ -98,7 +99,7 @@ residual_kikaku_time = [None for i in range(1000)]
 residual_time = [None for i in range(1000)]
 cnt = 0
 for i in range(6):
-    readifreqfile= open(filename[i]+'ifreq.dat','r')
+    readifreqfile= open('./analyzed_data/'+filename[i]+'ifreq.dat','r')
     ifreqdata = readifreqfile.readlines()
     steps = int(ifreqdata[0].rstrip('\n'))
     delay = 0.0
@@ -153,25 +154,40 @@ pylab.savefig("fitting_ifreqresidual_kikaku_time.png")
 
 print DX1
 print DY1
+
+
+fig = plt.figure(figsize=(10,8),dpi=400) 
+plt.rcParams['font.size']=15
 de1_para_ini = [3.4, -2.05, 0.55]
 de1_para_fin = scipy.optimize.fmin(cost_de1, de1_para_ini)
-de1graph = pylab.figure()
-pylab.bar(DX1,DY1,width = 0.2)
-dx1_fit = sp.arange(-2.0, 0.0, 0.1)
+de1graph = pylab.figure(figsize=(10,7),dpi=400)
+plt.bar(DX1,DY1,width = 0.2,color="#3b3b3b",alpha=0.7,label=r'Residual histogram')
+dx1_fit = sp.arange(-1.0, -0.14, 0.05)
 dy1_fit = [distribution_exp1(x,*de1_para_fin) for x in dx1_fit]
+dx1_fit2 = sp.append(-1.0,dx1_fit)
+dy1_fit2 = sp.append(0,dy1_fit)
 print de1_para_fin
-pylab.plot(dx1_fit, dy1_fit,'r--',linewidth=2.0)
+plt.plot(dx1_fit2, dy1_fit2,'g-',linewidth=2.0)
+#plt.fill(dx1_fit2, dy1_fit2,'g',alpha=0.8)
 
 DX2 = histreturn[1][5:BINS]
 DY2 = histreturn[0][5:]
-pylab.bar(DX2,DY2,width = 0.2)
+plt.bar(DX2,DY2,width = 0.2,color="#3b3b3b",alpha=0.7)
 de3_para_fin =[2.5,3.4,0.96,-0.09,1.99]
 de3_para_fin = scipy.optimize.fmin(cost_de3, de3_para_fin)
-dx3_fit = sp.arange(-0.5, 24.0, 0.1)
+dx3_fit = sp.arange(-0.14, 24.0, 0.05)
 dy3_fit = [distribution_exp3(x,*de3_para_fin) for x in dx3_fit]
 print de3_para_fin
-pylab.plot(dx3_fit, dy3_fit,'g--',linewidth=2.0)
-pylab.savefig("fitting_de.png")
+plt.plot(dx3_fit, dy3_fit,'g-',linewidth=2.0,label=r'$R(x)$')
+#plt.fill(dx3_fit, dy3_fit,'g',alpha=0.8)
+plt.fill_between(dx1_fit2,0,dy1_fit2,color='g',alpha=0.7)
+plt.fill_between(dx3_fit,0,dy3_fit,color='g',alpha=0.7)
+plt.xlim(-2,15)
+plt.ylim(0,120)
+plt.legend()
+plt.xlabel('Normalized residual',fontsize=30)
+plt.ylabel('Counts',fontsize=30)
+plt.savefig("fitting_de.png",transparent=True)
 
 xarr = sp.arange(-0.5,24.0,0.1)
 for i in xarr:
@@ -189,4 +205,4 @@ for i in range(len(de3_para_fin)):
     save_para.writelines(str(de3_para_fin[i])+'\t')
 save_para.write('\n')
 save_para.close()
-pylab.show()
+#pylab.show()
