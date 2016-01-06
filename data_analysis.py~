@@ -12,7 +12,8 @@ import matplotlib.pyplot as plt
 import math
 import os.path
 
-readfilelist = open("ListOfData.txt",'r')
+#readfilelist = open("ListOfData.txt",'r')
+readfilelist = open("listoffiles2.txt",'r')
 filenames = readfilelist.readlines()
 print filenames
 readfilelist.close()
@@ -146,6 +147,14 @@ def data_analysis(string) :
                 spikelist2[i] = 1
 #                print(i)
                 #            print (i)
+
+    ##Print spike timing
+    spfile = open("./analyzed_data/"+writename + 'spiketiming.dat','w')
+    for i in range(len(spikelist)):
+        spfile.writelines(repr(spikelist[i]*rec.dt)+'\n')
+    spfile.close()
+    ##Print spike timing end
+
 
     i=0
     for i in range(limit):
@@ -292,11 +301,13 @@ aver_f = open('./analyzed_data/average.dat','w')
 for i in range(RANGE):
     aver_f.writelines(repr(w_step_time[i])+'\t'+repr(w_step_freq[i])+'\n')
 
-flg3 = plt.figure()
-plt.bar(w_step_time, w_step_freq,width = 0.1)
-plt.ylim(0,160)
-plt.xlim(0,15)
-plt.xlabel('Time[s]')
-plt.ylabel('Frequency[Hz]')
+fig3 = plt.figure(figsize=(10,8),dpi=400)
+fig3.patch.set_alpha(0.0)
+plt.rcParams['font.size']=20
+plt.bar(w_step_time, w_step_freq,width = 0.1,color="#3b3b3b")
+plt.ylim(0,120)
+plt.xlim(0,14)
+plt.xlabel('Time[s]',fontsize=30)
+plt.ylabel('Frequency[Hz]',fontsize=30)
 plt.savefig("./graph/average.png")
 plt.close()

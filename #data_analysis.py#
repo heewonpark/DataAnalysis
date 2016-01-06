@@ -12,11 +12,6 @@ import matplotlib.pyplot as plt
 import math
 import os.path
 
-
-
-
-
-
 #readfilelist = open("ListOfData.txt",'r')
 readfilelist = open("listoffiles2.txt",'r')
 filenames = readfilelist.readlines()
