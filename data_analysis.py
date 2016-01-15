@@ -11,6 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import os.path
+#import seaborn as sns
+from SpikeDetector import spikedetector
 
 #readfilelist = open("ListOfData.txt",'r')
 readfilelist = open("listoffiles2.txt",'r')
@@ -24,7 +26,7 @@ w_step_freq = [0 for _ in range(RANGE)]
 DATABIN     = 0.1
 AVER_STIM   = 6.0
 #splist:spikelist2 ,dt = rec.dt, databin = timestep? timeWidth = limit
-def analysis_by_bin(wname,splist2,Bin, steps, delay, dt, timeWidth) :
+def analysis_by_bin(wname,splist2,Bin, steps, delay, dt, timeWidth,sstart,send) :
     step_freq = [0 for _ in range(steps+1)]
     step_num = [0 for _ in range(steps+1)]
     step_time = [0 for _ in range(steps+1)]
@@ -43,12 +45,15 @@ def analysis_by_bin(wname,splist2,Bin, steps, delay, dt, timeWidth) :
     for j in range(steps+1):
         step_freq[j] = step_num[j]/DATABIN
     
-    fig2 =plt.figure()
-    plt.bar(step_time, step_freq,width = 0.1)
-    plt.xlabel('Time[s]')
+    #fig2 =plt.figure()
+    fig2 =plt.figure(figsize=(12,8),dpi=400)
+    plt.bar(step_time, step_freq,width = 0.1,color='0.2')
+    plt.plot([sstart,send],[175,175],linewidth=8,color='k')
+    plt.xlabel('Time[s]',fontsize=20)
     plt.xlim(0,15)
-    plt.ylabel('Frequency[Hz]')
-
+    plt.ylim(0,180)
+    plt.ylabel('Frequency[Hz]',fontsize=20)
+    plt.title('PSTH',fontsize=20)
     plt.savefig("./graph/"+wname+"bin.png")
     plt.close()
     bin_file = open("./analyzed_data/"+wname+"bin.dat",'w')
@@ -79,6 +84,19 @@ def data_analysis(string) :
     clamp = rec[0][0]
     voltage = rec[0][2]
     limit = rec[0][0].asarray().shape[0]
+
+    flg=0
+    for i in range(limit):
+        if i==0:
+            pass
+        elif(voltage[i-1]-0.2)*(voltage[i]-0.2)<0:
+            if flg==0:
+                stim_start = i*rec.dt
+                flg +=1
+            elif flg==1:
+                stim_end = i*rec.dt
+                flg = 0
+    flg=0
     
     time = np.arange(0.0, limit, 1.0) * rec.dt
     threshold_c = 0.75 #for cclamp 
@@ -255,7 +273,7 @@ def data_analysis(string) :
     delay = int(starttime.strip('\n'))
     print 'delay ' +repr(delay)+'steps '+repr(steps)
 
-    analysis_by_bin(writename, spikelist2,Bin,steps,delay,rec.dt, limit)
+    analysis_by_bin(writename, spikelist2,Bin,steps,delay,rec.dt, limit,stim_start,stim_end)
 
     f.close()
     flg = plt.figure()
@@ -271,13 +289,15 @@ def data_analysis(string) :
     plt.savefig("./graph/"+writename+"instantaneusFrequency.png")
     plt.close()
 
-    flg2__ = plt.figure()
-    plt.plot(if_2t,if_2)
+    #flg2__ = plt.figure()
+    fig2__ =plt.figure(figsize=(12,8),dpi=400)
+    plt.plot([stim_start,stim_end],[295,295],linewidth=8,color='k')
+    plt.plot(if_2t,if_2,color='0.2')
     plt.ylim(0,300)
     plt.xlim(0,15)
-    plt.xlabel('Time[s]')
-    plt.ylabel('Frequency[Hz]')
-    plt.title('Instantaneus Frequency')
+    plt.xlabel('Time[s]',fontsize=20)
+    plt.ylabel('Frequency[Hz]',fontsize=20)
+    plt.title('Instantaneus Frequency',fontsize=20)
     plt.savefig("./graph/"+writename+"if.png")
     plt.close()
     #plt.show()
@@ -304,9 +324,9 @@ for i in range(RANGE):
 fig3 = plt.figure(figsize=(10,8),dpi=400)
 fig3.patch.set_alpha(0.0)
 plt.rcParams['font.size']=20
-plt.bar(w_step_time, w_step_freq,width = 0.1,color="#3b3b3b")
+plt.bar(np.array(w_step_time)-6.0, w_step_freq,width = 0.1,color="#3b3b3b")
 plt.ylim(0,120)
-plt.xlim(0,14)
+plt.xlim(-6,8)
 plt.xlabel('Time[s]',fontsize=30)
 plt.ylabel('Frequency[Hz]',fontsize=30)
 plt.savefig("./graph/average.png")
