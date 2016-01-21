@@ -265,39 +265,50 @@ class analyzer:
             spikearray = np.array([self.spikes])
             np.savetxt("%s%s_adjusted_spt.txt"%(SAVE_DIR,self.name2),spikearray,fmt='%.6f',delimiter='\t',header=HEADER)
 
-    def psth(self):
-        x_range  = 10.0 # Second
-        bin_size = 0.1  # Second
-        self.time     = np.arange(0.0,x_range,bin_size)
+    def psth(self,x_range=10):
+        #x_range  = 10.0 # Second
+        self.bin_size = 0.1  # Second
+        self.time     = np.arange(0.0,x_range,self.bin_size)
         nspikes  = [0 for i in range(len(self.time))]
         self.freqs    = [0 for i in range(len(self.time))]
         try:
             for sp in self.spikes:
-                x = int(np.floor(sp/bin_size))
+                x = int(np.floor(sp/self.bin_size))
                 #print sp,x
                 if(x<(len(self.time)))&(x>=0):
                     nspikes[x]+=1
         except TypeError:
-            x = int(np.floor(self.spikes/bin_size))
+            x = int(np.floor(self.spikes/self.bin_size))
             if(x<(len(self.time)))&(x>=0):
                 nspikes[x]+=1
         #print nspikes
 
         for i in range(len(nspikes)):
-            self.freqs[i] = nspikes[i]/bin_size
+            self.freqs[i] = nspikes[i]/self.bin_size
 
+        SAVE_DIR = self.data_dir+'psth/'
+        if not os.path.exists(SAVE_DIR):
+            os.mkdir(SAVE_DIR)
+        self.writePSTH(self.freqs,self.dose,SAVE_DIR+self.name2+'_psth.dat')
         fig = plt.figure()
         plt.bar(self.time,self.freqs,width=0.1,color='b')
         plt.xlabel('Time[s]')
         plt.ylabel('Frequency[Hz]')
-        plt.xlim(0,10)
+        plt.xlim(0,x_range)
         plt.xticks(np.arange(10))
         plt.title('NAME : %s DOSE : %d'%(self.name2,self.dose))
+        plt.savefig(SAVE_DIR+self.name2+'_psth.png')
+        plt.close()
+
+    def writePSTH(self,Freqs,Dose,Name=None):
         SAVE_DIR = self.data_dir+'psth/'
         if not os.path.exists(SAVE_DIR):
             os.mkdir(SAVE_DIR)
-        plt.savefig(SAVE_DIR+self.name2+'_psth.png')
-        plt.close()
+        psth_dat = np.array([self.time+self.bin_size/2.0,self.freqs])
+        psth_dat = psth_dat.T
+        if(Name==None):
+            Name='%sDose%d_psth.png'%(SAVE_DIR,Dose)
+        np.savetxt(Name,psth_dat,fmt='%.3f',delimiter=',')
 
     def drawPSTH(self,Freqs,Dose):
         fig = plt.figure()

@@ -205,4 +205,4 @@ for i in range(len(de3_para_fin)):
     save_para.writelines(str(de3_para_fin[i])+'\t')
 save_para.write('\n')
 save_para.close()
-#pylab.show()
+pylab.show()

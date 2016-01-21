@@ -73,7 +73,7 @@ print X
 print 'Y'
 print Y
 """
-
+"""
 #---------------------------------------------
 # LOAD PARAMETERS FOR FUNCTION
 #parameter = np.loadtxt("exponential_function_parameters.txt",float)
@@ -81,8 +81,11 @@ parameter = np.loadtxt("exponential_function_parameters_result.txt",float)
 #param_fin = [0.0001333, 12.91, 0.5157,5.639, 4.726]
 param_fin = scipy.optimize.fmin(cost_fn2, parameter,xtol=1e-8)
 print param_fin
+print "result: ", cost_fn2(param_fin)
 np.savetxt("exponential_function_parameters_result.txt",param_fin)
-
+"""
+param_fin =[0.000101179400592, 6.8387080742, 0.501294668549, 5.64646765088, 4.17949887855]
+print "result: ", cost_fn2(param_fin)
 """
 print 'leastsq---------------------------------------------------------------------------'
 param_leastsq = scipy.optimize.leastsq(residue, param_ini, args=(Y,X),full_output=True)

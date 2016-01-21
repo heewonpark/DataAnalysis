@@ -22,7 +22,7 @@ def load_datalist(_FILENAME_):
 
 def main():
     print "*** Spike Analyzer ***"
-    
+   
     load_datalist('./atf/analyzed_data/datalist.csv')    
     data_dir = './atf/analyzed_data/'
     anas = []
@@ -76,6 +76,15 @@ def main():
         elif(a.dose==10000):
             d10000 = d10000 + a.freqs
             c10000+=1
+
+    
+    ana.writePSTH(d10/c10,10)
+    ana.writePSTH(d100/c100,100)
+    ana.writePSTH(d1000/c1000,1000)
+    ana.writePSTH(d2000/c2000,2000)
+    ana.writePSTH(d5000/c5000,5000)
+    ana.writePSTH(d10000/c10000,10000)
+
     ana.drawPSTH(d10/c10,10)
     ana.drawPSTH(d100/c100,100)
     ana.drawPSTH(d1000/c1000,1000)
@@ -84,8 +93,40 @@ def main():
     ana.drawPSTH(d10000/c10000,10000)
     print "*** END ***"
 
+def main_30stims():
+    print "*** Spike Analyzer ***"
+    D = {"name":"15d29000.abf","dose":3000,"nstims":30,"id":"1"}
+    #load_datalist('./atf/analyzed_data/datalist.csv')    
+    data_dir = './atf/'
+    anas = []
+    #for D in data:
+    name, ext = os.path.splitext(D["name"])
+    print name
+    spt = "%s%s_spt.txt"%(data_dir,name)
+    #stim= "%s%s_stim.txt"%(data_dir,name)
+    ana = analyzer(D)
+    #ana.load_stim_info(stim)
+    ana.stim_start=0
+    ana.load_spt(spt)
+    ana.psth(x_range=40)
+    anas.append(ana)
+    
+    d3000   = [0.0 for i in range(100)]
+    d3000 = np.array(d3000)
+    
+    c3000  =0
+    """
+    for a in anas:
+        if(a.dose==3000):
+            d3000 = d3000 + a.freqs
+            c3000+=1
+    ana.drawPSTH(d3000/c3000,3000)
+    """
+    print "*** END ***"
+
 if __name__=="__main__":
     main()
+    #main_30stims()
 
 """
 if __name__=="__main__":
