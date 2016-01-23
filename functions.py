@@ -46,3 +46,18 @@ class functions:
         return alpha * sp.exp(-(x-beta)/gamma)+c
     def cost_de4(de4_para):
         return sum((distribution_exp4(x,*de4_para)-y)**2 for x,y in zip(DX2, DY2))
+    def Michaelis_Menten_1(self,c,K,Tau_max):
+        n = 1.0
+        r = Tau_max/(1+np.power(K/c,n))
+        return r
+
+    def Michaelis_Menten_2(self,c,parameter):
+        K = parameter[0]
+        Tau_max = parameter[1]
+        n = parameter[2]
+        r = Tau_max/(1+np.power(K/c,n))
+        return r
+
+    def fit_func(parameter,x,y):
+        residual = y-Michaelis_Menten_2(x,parameter)
+        return residual

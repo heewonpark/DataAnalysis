@@ -2,7 +2,7 @@ import numpy as np
 import sys
 import os.path
 import csv
-from SpikeDetector import spikedetector,analyzer
+from SpikeAnalyzer import spikedetector,analyzer
 
 def analyze(_FILENAME_):
     sd = spikedetector()
@@ -23,8 +23,8 @@ def load_datalist(_FILENAME_):
 def main():
     print "*** Spike Analyzer ***"
    
-    load_datalist('./atf/analyzed_data/datalist.csv')    
-    data_dir = './atf/analyzed_data/'
+    load_datalist('./bombykol_200ms/analyzed_data/datalist.csv')    
+    data_dir = './bombykol_200ms/analyzed_data/'
     anas = []
     for D in data:
         name, ext = os.path.splitext(D["name"])
@@ -49,7 +49,13 @@ def main():
     d2000 = np.array(d2000)
     d5000 = np.array(d5000)
     d10000= np.array(d10000)
-    
+    d10all   =[]
+    d100all  =[]
+    d1000all =[]
+    d2000all =[]
+    d5000all =[]
+    d10000all=[]
+
     c10  =0
     c100 =0
     c1000=0
@@ -60,24 +66,38 @@ def main():
     for a in anas:
         if(a.dose==10):
             d10 = d10 + a.freqs
+            d10all.append(a.freqs)
             c10+=1
         elif(a.dose==100):
             d100 = d100 + a.freqs
+            d100all.append(a.freqs)
             c100+=1
         elif(a.dose==1000):
             d1000 = d1000 + a.freqs
+            d1000all.append(a.freqs)
             c1000+=1
         elif(a.dose==2000):
             d2000 = d2000 + a.freqs
+            d2000all.append(a.freqs)
             c2000+=1
         elif(a.dose==5000):
             d5000 = d5000 + a.freqs
+            d5000all.append(a.freqs)
             c5000+=1
         elif(a.dose==10000):
             d10000 = d10000 + a.freqs
+            d10000all.append(a.freqs)
             c10000+=1
 
-    
+    print ana.bin_size
+
+    ana.writePSTH_ALL(d10all,10)
+    ana.writePSTH_ALL(d100all,100)
+    ana.writePSTH_ALL(d1000all,1000)
+    ana.writePSTH_ALL(d2000all,2000)
+    ana.writePSTH_ALL(d5000all,5000)
+    ana.writePSTH_ALL(d10000all,10000)
+
     ana.writePSTH(d10/c10,10)
     ana.writePSTH(d100/c100,100)
     ana.writePSTH(d1000/c1000,1000)
@@ -97,7 +117,7 @@ def main_30stims():
     print "*** Spike Analyzer ***"
     D = {"name":"15d29000.abf","dose":3000,"nstims":30,"id":"1"}
     #load_datalist('./atf/analyzed_data/datalist.csv')    
-    data_dir = './atf/'
+    data_dir = './bombykol_200ms/'
     anas = []
     #for D in data:
     name, ext = os.path.splitext(D["name"])

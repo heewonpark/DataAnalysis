@@ -1,7 +1,7 @@
 import sys
 import os.path
 
-from SpikeDetector import spikedetector
+from SpikeAnalyzer import spikedetector
 
 """
 sd = spikedetector("./08816035.atf")
