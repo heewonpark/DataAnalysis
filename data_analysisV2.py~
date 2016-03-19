@@ -1,3 +1,0 @@
-import SpikeDetector as sd
-
-sd.read("./08816035.atf")

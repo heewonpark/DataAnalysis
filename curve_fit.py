@@ -29,6 +29,8 @@ def fit_func(parameter,x,y):
 fig = plt.figure(figsize=(10,8),dpi=400)
 plt.rcParams['font.size']=15
 plt.plot(x,y,'go',label="Maximum Frequency")
+x_tmp = x
+y_tmp = y
 x = [float(xn) for xn in x]
 y = [float(yn) for yn in y]
 x = np.array(x)
@@ -73,3 +75,27 @@ plt.savefig('Michaelis-menten_fitted_curve2PSTH.png',transparent=True)
 
 #plt.show()
 
+#### Graph for Presentation
+#plt.rcParams['font.family'] = 'Times New Roman'
+plt.rcParams['font.size'] = 20
+plt.rcParams['axes.linewidth'] = 2.0
+#plt.rcParams['xtics.major.size'] = 10
+#plt.rcParams['xtics.major.width'] = 1.5
+
+fig = plt.figure(figsize=(5,4),dpi=250)
+fig.subplots_adjust(bottom=0.2,left =0.20)
+ax = fig.add_subplot(111)
+fig.patch.set_alpha(0.0)
+
+plt.plot(x_tmp,y_tmp,'ko')
+plt.plot(x_,Michaelis_Menten_2(x_,result[0]),'r-',label=r"$M(c)$")
+plt.xscale('log')
+plt.xlabel('Dose[ng]')
+plt.ylabel('Maximum frequency[Hz]')
+print np.logspace(1,7,num=3)
+plt.xticks(np.logspace(0,6,num=3))
+plt.yticks(np.arange(0,210,50))
+plt.ylim(0,200)
+plt.legend(loc='upper left',frameon=False,fontsize=15)
+#plt.savefig('Michaelis-menten_fitted_curve2.png')
+plt.savefig('Michaelis-menten_fitted_curve2PSTH_fp.png',transparent=True)

@@ -19,10 +19,10 @@ def sp_detect(_FILENAME_):
     sd = spikedetector(_FILENAME_)
     sd.pos_threshold=0.1
     sd.neg_threshold=-0.2
-    sd.get_stim_offset()
-    sd.save_stim_info()
-    #sd.forward_detector()
-    #sd.drawGraph_per_sec()
+    #sd.get_stim_offset()
+    #sd.save_stim_info()
+    sd.forward_detector()
+    #sd.drawGraph_per_sec_forThesis()
     #sd.save_spt()
     print "** END DETECTING **"
     #print sd.pos_spikes
@@ -41,7 +41,7 @@ if __name__=="__main__":
         print "NO FILENAME"
     elif len(sys.argv) is 2:
         if(os.path.isfile(sys.argv[1])):
-            sd_detect(sys.argv[1])
+            sp_detect(sys.argv[1])
             #analyze(sys.argv[1])
         elif(os.path.isdir(sys.argv[1])):
             print "%s is directory"%sys.argv[1]

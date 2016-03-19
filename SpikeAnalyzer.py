@@ -12,6 +12,27 @@ import matplotlib.pyplot as plt
 import math
 import os.path
 
+
+def raster(event_times_list, color='k'):
+    """
+    Creates a raster plot
+    Parameters
+    ----------
+    event_times_list : iterable
+                       a list of event time iterables
+    color : string
+            color of vlines
+    Returns
+    -------
+    ax : an axis containing the raster plot
+    """
+    ax = plt.gca()
+    for ith, trial in enumerate(event_times_list):
+        plt.vlines(trial, ith + .5, ith + 1.5,linewidth=1.0, color=color)
+    plt.ylim(.5, len(event_times_list) + .5)
+    return ax
+
+
 class spikedetector:
     stim_threshold = 0.2
     pos_threshold = 0.1
@@ -99,7 +120,8 @@ class spikedetector:
                                 self.neg_spikes.append(neg_timing)
                                 print result[0]*self.dt, neg_timing*self.dt
                                 if(figure==True):
-                                    self.drawGraph_of_Spike(result[0],neg_timing)
+                                    #self.drawGraph_of_Spike(result[0],neg_timing)
+                                    self.drawGraph_of_Spike_forThesis(result[0],neg_timing)
                     neg_peak = 1
                     neg_timing = -1
                 elif(spike_flg == False)&(self.volt[i]<self.neg_threshold):
@@ -182,6 +204,47 @@ class spikedetector:
         plt.title("%f to %f"%(self.time[p_peak],self.time[n_peak]))
         plt.savefig("./%s/%d.png"%(self.SAVEFILE,p_peak))
         plt.close()
+
+    def drawGraph_of_Spike_forThesis(self,p_peak,n_peak):
+        #fig = plt.figure()
+        #fig = plt.figure()
+        fig = plt.figure(figsize=(10,8),dpi=400)
+        #fig.subplots_adjust(bottom=0.2)
+        #ax = fig.add_subplot(111)
+        #plt.rcParams['font.family'] = 'Times New Roman' #全体のフォントを設定
+        plt.rcParams['font.size'] = 20 #フォントサイズを設定
+        #plt.rcParams['axes.linewidth'] = 1.5 #軸の太さを設定。目盛りは変わらない
+        #plt.rcParams['xtics.major.size'] = 10 #x軸目盛りの長さ                         
+        #plt.rcParams['xtics.major.width'] = 1.5 #x軸目盛りの太さ     
+        
+        if(p_peak-100<0):
+            _min_ = 0
+        else:
+            _min_ = p_peak-100
+        if(n_peak+100>self.steps-1):
+            _max_ = self.steps-1
+        else:
+            _max_ =n_peak+100
+        #print "Min Max",_min_,_max_
+        #print self.time[_min_:_max_]
+        #print self.volt
+        #print self.volt[_min_:_max_]
+        if not os.path.exists("./%s"%self.SAVEFILE):
+            os.mkdir("./%s"%self.SAVEFILE)
+        plt.plot(self.time[_min_:_max_],self.volt[_min_:_max_],'k',linewidth=2.0)
+        plt.plot([self.time[_min_],self.time[_max_]],[self.pos_threshold,self.pos_threshold],'r-',linewidth=2.0,label='threshold')
+        plt.plot([self.time[_min_],self.time[_max_]],[self.neg_threshold,self.neg_threshold],'r-',linewidth=2.0)
+        plt.plot(self.time[p_peak],self.volt[p_peak],"rx")
+        #plt.text(self.time[p_peak],self.volt[p_peak]+0.1,"%f,%f"%(self.volt[p_peak],self.time[p_peak]),fontsize=15)
+        plt.plot(self.time[n_peak],self.volt[n_peak],"rx")
+        #plt.text(self.time[n_peak],self.volt[n_peak]-0.1,"%f"%self.volt[n_peak],fontsize=15)
+        plt.ylim(-0.8,0.8)
+        plt.legend(frameon=False)
+        plt.xlabel("Time[s]")
+        plt.ylabel("Voltage[mV]")
+        #plt.title("%f to %f"%(self.time[p_peak],self.time[n_peak]))
+        plt.savefig("./%s/%d_ft.png"%(self.SAVEFILE,p_peak))
+        plt.close()
     
     def drawGraph_per_sec(self):
         x_range10 = int(1.0/self.dt)
@@ -215,6 +278,47 @@ class spikedetector:
             plt.savefig("./%s/%dsec.png"%(self.SAVEFILE,i))
             plt.close()
 
+    def drawGraph_per_sec_forThesis(self):
+        x_range10 = int(1.0/self.dt)
+        x_range12 = int(1.2/self.dt)
+        n_graphs  = np.ceil(self.steps/float(x_range10))
+        print "steps", self.steps
+        if not os.path.exists("./%s"%self.SAVEFILE):
+            os.mkdir("./%s"%self.SAVEFILE)
+        for i in range(int(n_graphs)):
+            #fig = plt.figure()
+            fig = plt.figure(figsize=(10,8),dpi=400)
+            #fig.subplots_adjust(bottom=0.2)
+            #ax = fig.add_subplot(111)
+            #plt.rcParams['font.family'] = 'Times New Roman' #全体のフォントを設定
+            plt.rcParams['font.size'] = 20 #フォントサイズを設定
+            #plt.rcParams['axes.linewidth'] = 1.5 #軸の太さを設定。目盛りは変わらない
+            #plt.rcParams['xtics.major.size'] = 10 #x軸目盛りの長さ                         
+            #plt.rcParams['xtics.major.width'] = 1.5 #x軸目盛りの太さ     
+
+            x_min = i*x_range10
+            x_max = x_min+x_range12
+            if(x_max>=self.steps):
+                x_max=self.steps-1
+            plt.plot(self.time[x_min:x_max],self.volt[x_min:x_max],'b')
+            plt.plot([self.time[x_min],self.time[x_max]],[self.pos_threshold,self.pos_threshold],'r-',linewidth=2.0)
+            plt.plot([self.time[x_min],self.time[x_max]],[self.neg_threshold,self.neg_threshold],'r-',linewidth=2.0)
+            for sp in self.pos_spikes:
+                if(sp>=x_min)&(sp<x_max):
+                    plt.plot(self.time[sp],self.volt[sp],"rx",linewidth=3.0)
+                    #plt.text(self.time[sp],self.volt[sp]+0.1,"%f"%self.volt[sp],fontsize=15)
+            for sp in self.neg_spikes:
+                if(sp>=x_min)&(sp<x_max):
+                    plt.plot(self.time[sp],self.volt[sp],"rx",linewidth=3.0)
+                    #plt.text(self.time[sp],self.volt[sp]-0.1,"%f"%self.volt[sp],fontsize=15)
+            plt.ylim(-0.8,0.8)
+            plt.xlim(1.0*i,1.0*i+1.2)
+            plt.xlabel("Time[s]")
+            plt.ylabel("Voltage[mV]")
+            plt.title("%.2fs to %.2fs"%(x_min*self.dt,x_max*self.dt))
+            plt.savefig("./%s/%dsec_forThesis.png"%(self.SAVEFILE,i))
+            plt.close()
+
     def save_spt(self):
         #Save spike timing file
         HEADER = "Num : %d"%(len(self.pos_spikes))
@@ -226,6 +330,11 @@ class spikedetector:
 
 class analyzer:
     data_dir = './bombykol_200ms/analyzed_data/'
+    def __init__(self):
+        self.stim_start = -1
+        self.stim_end   = -1
+        self.spikes     = []
+
     def __init__(self,Dict):
         self.stim_start = -1
         self.stim_end   = -1
@@ -299,6 +408,42 @@ class analyzer:
         plt.savefig(SAVE_DIR+self.name2+'_psth.png')
         plt.close()
 
+    def psth_forRaster(self,x_range=10):
+        #x_range  = 10.0 # Second
+        self.bin_size = 0.1  # Second
+        self.time     = np.arange(-1.0,x_range,self.bin_size)
+        nspikes  = [0 for i in range(len(self.time))]
+        self.freqs    = [0 for i in range(len(self.time))]
+        try:
+            for sp in self.spikes:
+                x = int(np.floor(sp/self.bin_size))
+                #print sp,x
+                if(x<(len(self.time)-1/self.bin_size))&(x>=-10):
+                    nspikes[x+int(1/self.bin_size)]+=1
+                #print nspikes
+        except TypeError:
+            x = int(np.floor(self.spikes/self.bin_size))
+            if(x<(len(self.time)-1/self.bin_size))&(x>=-10):
+                nspikes[x+int(1/self.bin_size)]+=1
+        #print nspikes
+
+        for i in range(len(nspikes)):
+            self.freqs[i] = nspikes[i]/self.bin_size
+
+        SAVE_DIR = self.data_dir+'psth/'
+        if not os.path.exists(SAVE_DIR):
+            os.mkdir(SAVE_DIR)
+        self.writePSTH(self.freqs,self.dose,SAVE_DIR+self.name2+'_psth_raster.dat')
+        fig = plt.figure()
+        plt.bar(self.time,self.freqs,width=0.1,color='b')
+        plt.xlabel('Time[s]')
+        plt.ylabel('Frequency[Hz]')
+        plt.xlim(-1.0,x_range)
+        plt.xticks(np.arange(-1,10))
+        plt.title('NAME : %s DOSE : %d'%(self.name2,self.dose))
+        plt.savefig(SAVE_DIR+self.name2+'_psth_raster.png')
+        plt.close()
+
     def writePSTH(self,Freqs,Dose,Name=None):
         SAVE_DIR = self.data_dir+'psth/'
         if not os.path.exists(SAVE_DIR):
@@ -343,6 +488,46 @@ class analyzer:
         if not os.path.exists(SAVE_DIR):
             os.mkdir(SAVE_DIR)
         plt.savefig('%sDose%d_psth.png'%(SAVE_DIR,Dose))
+        plt.close()
+
+    def drawPSTH_withRaster(self,Freqs,Dose,spt):
+        fig = plt.figure(figsize=(10,8),dpi=400)
+        fig = plt.figure()
+        print Freqs
+        print spt
+
+        #fig.subplots_adjust(bottom=0.2)
+        #ax = fig.add_subplot(111)
+        #plt.rcParams['font.family'] = 'Times New Roman' #全体のフォントを設定
+        plt.rcParams['font.size'] = 20 #フォントサイズを設定
+        #plt.rcParams['axes.linewidth'] = 1.5 #軸の太さを設定。目盛りは変わらない
+        #plt.rcParams['xtics.major.size'] = 10 #x軸目盛りの長さ                         
+        #plt.rcParams['xtics.major.width'] = 1.5 #x軸目盛りの太さ     
+    
+        ax1 = fig.add_axes((0.1, 0.75, 0.8, 0.15))
+        ax1 = raster(spt,color='b')
+        plt.ylabel('RNs')
+        plt.title('DOSE : %d [ng]'%(Dose))
+        ax2 = fig.add_axes((0.1, 0.15, 0.8, 0.60), sharex=ax1)
+
+        # 散布図のx軸のラベルとヒストグラムのy軸のラベルを非表示
+        ax1.tick_params(labelbottom="off")
+        ax1.tick_params(labelleft="off")
+        #ax2.tick_params(labelleft="off")
+
+        plt.bar(self.time,Freqs,width=0.1,color='b')
+        plt.xlabel('Time[s]')
+        plt.ylabel('Frequency[Hz]')
+        #plt.xticks(np.arange(10))
+        plt.plot([0,0.200],[58,58],'k',linewidth=4.0)
+        plt.xlim(-1,5)
+        plt.ylim(0,60)
+        plt.yticks(np.arange(0,60,10))
+        SAVE_DIR = self.data_dir+'psth/'
+
+        if not os.path.exists(SAVE_DIR):
+            os.mkdir(SAVE_DIR)
+        plt.savefig('%sDose%d_PSTH_withRaster.png'%(SAVE_DIR,Dose))
         plt.close()
 
 class fitting:
